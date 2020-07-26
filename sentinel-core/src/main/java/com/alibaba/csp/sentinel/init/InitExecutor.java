@@ -43,12 +43,16 @@ public final class InitExecutor {
             return;
         }
         try {
+            //spi  默认配置 com.alibaba.csp.sentinel.metric.extension.MetricCallbackInit
+            // 这里注意，不同的app形式，提供的实现都不一样
             ServiceLoader<InitFunc> loader = ServiceLoaderUtil.getServiceLoader(InitFunc.class);
             List<OrderWrapper> initList = new ArrayList<OrderWrapper>();
             for (InitFunc initFunc : loader) {
                 RecordLog.info("[InitExecutor] Found init func: " + initFunc.getClass().getCanonicalName());
+                //按照排序 插入到结婚initList
                 insertSorted(initList, initFunc);
             }
+            //以此对集合中的对象调用init方法
             for (OrderWrapper w : initList) {
                 w.func.init();
                 RecordLog.info(String.format("[InitExecutor] Executing %s with order %d",

@@ -95,6 +95,7 @@ public final class FlowRuleUtil {
         Map<K, Set<FlowRule>> tmpMap = new ConcurrentHashMap<>();
 
         for (FlowRule rule : list) {
+            //监测rule配置的相关策略 是否有效
             if (!isValidRule(rule)) {
                 RecordLog.warn("[FlowRuleManager] Ignoring invalid flow rule when loading new flow rules: " + rule);
                 continue;
@@ -109,10 +110,13 @@ public final class FlowRuleUtil {
             TrafficShapingController rater = generateRater(rule);
             rule.setRater(rater);
 
+            //这里获取规则的名称，默认resource
             K key = groupFunction.apply(rule);
             if (key == null) {
                 continue;
             }
+
+            //这里可以看到一个资源可以对应多个规则
             Set<FlowRule> flowRules = tmpMap.get(key);
 
             if (flowRules == null) {
@@ -123,6 +127,7 @@ public final class FlowRuleUtil {
 
             flowRules.add(rule);
         }
+        // 对规则进行排序
         Comparator<FlowRule> comparator = new FlowRuleComparator();
         for (Entry<K, Set<FlowRule>> entries : tmpMap.entrySet()) {
             List<FlowRule> rules = new ArrayList<>(entries.getValue());
@@ -130,6 +135,7 @@ public final class FlowRuleUtil {
                 // Sort the rules.
                 Collections.sort(rules, comparator);
             }
+            //将排序好的结果插入到集合
             newRuleMap.put(entries.getKey(), rules);
         }
 

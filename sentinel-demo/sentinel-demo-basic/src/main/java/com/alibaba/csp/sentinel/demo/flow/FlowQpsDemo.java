@@ -47,10 +47,13 @@ public class FlowQpsDemo {
     private static int seconds = 60 + 40;
 
     public static void main(String[] args) throws Exception {
+        // 初始化限流规则
         initFlowQpsRule();
 
+        //开始统计线程
         tick();
         // first make the system run on a very low condition
+        //开启模拟线程
         simulateTraffic();
 
         System.out.println("===== begin to do flow control");

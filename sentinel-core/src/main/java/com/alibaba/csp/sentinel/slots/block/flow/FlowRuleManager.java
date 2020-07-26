@@ -55,6 +55,7 @@ public class FlowRuleManager {
     private static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1,
         new NamedThreadFactory("sentinel-metrics-record-task", true));
 
+    //静态构造函数，currentProperty被赋值
     static {
         currentProperty.addListener(LISTENER);
         SCHEDULER.scheduleAtFixedRate(new MetricTimerListener(), 0, 1, TimeUnit.SECONDS);
@@ -128,6 +129,7 @@ public class FlowRuleManager {
 
         @Override
         public void configUpdate(List<FlowRule> value) {
+            //对原始rule进行规则校验，并分组
             Map<String, List<FlowRule>> rules = FlowRuleUtil.buildFlowRuleMap(value);
             if (rules != null) {
                 flowRules.clear();
