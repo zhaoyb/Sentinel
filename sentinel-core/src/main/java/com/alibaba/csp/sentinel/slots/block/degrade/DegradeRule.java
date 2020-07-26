@@ -192,6 +192,7 @@ public class DegradeRule extends AbstractRule {
             return true;
         }
 
+        // 根据RT降级
         if (grade == RuleConstant.DEGRADE_GRADE_RT) {
             double rt = clusterNode.avgRt();
             if (rt < this.count) {
@@ -204,6 +205,7 @@ public class DegradeRule extends AbstractRule {
                 return true;
             }
         } else if (grade == RuleConstant.DEGRADE_GRADE_EXCEPTION_RATIO) {
+            // 根据成功失败比例 降级
             double exception = clusterNode.exceptionQps();
             double success = clusterNode.successQps();
             double total = clusterNode.totalQps();
@@ -223,6 +225,7 @@ public class DegradeRule extends AbstractRule {
                 return true;
             }
         } else if (grade == RuleConstant.DEGRADE_GRADE_EXCEPTION_COUNT) {
+            // 根据错误次数降级
             double exception = clusterNode.totalException();
             if (exception < count) {
                 return true;

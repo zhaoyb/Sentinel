@@ -26,6 +26,7 @@ public final class TimeUtil {
 
     private static volatile long currentTimeMillis;
 
+    // 当前时间， 因为获取当前时间，会使用到系统调用， 性能会有损失，这里是自己维护了一个时间
     static {
         currentTimeMillis = System.currentTimeMillis();
         Thread daemon = new Thread(new Runnable() {

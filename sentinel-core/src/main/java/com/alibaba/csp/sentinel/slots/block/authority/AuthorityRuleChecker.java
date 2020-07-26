@@ -52,11 +52,13 @@ final class AuthorityRuleChecker {
             contain = exactlyMatch;
         }
 
+        // 规则策略
         int strategy = rule.getStrategy();
+        // 黑名单  并且包含在黑名单中
         if (strategy == RuleConstant.AUTHORITY_BLACK && contain) {
             return false;
         }
-
+        // 白名单， 并且不包含在白名单中
         if (strategy == RuleConstant.AUTHORITY_WHITE && !contain) {
             return false;
         }

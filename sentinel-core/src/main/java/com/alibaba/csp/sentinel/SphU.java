@@ -80,11 +80,13 @@ public class SphU {
 
     /**
      * Checking all {@link Rule}s about the resource.
+     * 申请资源
      *
-     * @param name the unique name of the protected resource
+     * @param name the unique name of the protected resource  受保护的资源名称
      * @throws BlockException if the block criteria is met, eg. when any rule's threshold is exceeded.
      */
     public static Entry entry(String name) throws BlockException {
+        // sph  默认实现  CtSph
         return Env.sph.entry(name, EntryType.OUT, 1, OBJECTS0);
     }
 

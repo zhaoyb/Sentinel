@@ -54,10 +54,13 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
                       boolean prioritized, Object... args) throws Throwable {
         try {
             // Do some checking.
+            // 触发chain上的下一个 slot
             fireEntry(context, resourceWrapper, node, count, prioritized, args);
 
             // Request passed, add thread count and pass count.
+            // 调用次数 +1
             node.increaseThreadNum();
+            // 通过次数 +1
             node.addPassRequest(count);
 
             if (context.getCurEntry().getOriginNode() != null) {
@@ -77,6 +80,7 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
                 handler.onPass(context, resourceWrapper, node, count, args);
             }
         } catch (PriorityWaitException ex) {
+            // 请求次数 +1
             node.increaseThreadNum();
             if (context.getCurEntry().getOriginNode() != null) {
                 // Add count for origin node.
@@ -92,10 +96,12 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
                 handler.onPass(context, resourceWrapper, node, count, args);
             }
         } catch (BlockException e) {
+            // 被阻塞
             // Blocked, set block exception to current entry.
             context.getCurEntry().setError(e);
 
             // Add block count.
+            // 被阻塞次数 +1
             node.increaseBlockQps(count);
             if (context.getCurEntry().getOriginNode() != null) {
                 context.getCurEntry().getOriginNode().increaseBlockQps(count);
@@ -113,6 +119,7 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
             throw e;
         } catch (Throwable e) {
+            // 未捕获异常
             // Unexpected error, set error to current entry.
             context.getCurEntry().setError(e);
 
@@ -135,6 +142,7 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
         if (context.getCurEntry().getError() == null) {
             // Calculate response time (max RT is statisticMaxRt from SentinelConfig).
+            // 响应时间
             long rt = TimeUtil.currentTimeMillis() - context.getCurEntry().getCreateTime();
             int maxStatisticRt = SentinelConfig.statisticMaxRt();
             if (rt > maxStatisticRt) {
@@ -147,6 +155,7 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
                 context.getCurEntry().getOriginNode().addRtAndSuccess(rt, count);
             }
 
+            // 线程调用次数 -1
             node.decreaseThreadNum();
 
             if (context.getCurEntry().getOriginNode() != null) {

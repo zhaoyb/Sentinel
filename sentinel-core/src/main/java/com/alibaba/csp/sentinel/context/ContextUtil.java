@@ -57,6 +57,7 @@ public class ContextUtil {
     private static final ReentrantLock LOCK = new ReentrantLock();
     private static final Context NULL_CONTEXT = new NullContext();
 
+    // 静态初始化
     static {
         // Cache the entrance node for default context.
         initDefaultContext();

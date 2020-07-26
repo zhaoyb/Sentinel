@@ -151,14 +151,17 @@ public class NodeSelectorSlot extends AbstractLinkedProcessorSlot<Object> {
          * {@link ClusterNode}. See {@link ClusterBuilderSlot} for detail.
          */
         DefaultNode node = map.get(context.getName());
+        // double check
         if (node == null) {
             synchronized (this) {
                 node = map.get(context.getName());
                 if (node == null) {
                     node = new DefaultNode(resourceWrapper, null);
+
                     HashMap<String, DefaultNode> cacheMap = new HashMap<String, DefaultNode>(map.size());
                     cacheMap.putAll(map);
                     cacheMap.put(context.getName(), node);
+
                     map = cacheMap;
                     // Build invocation tree
                     ((DefaultNode) context.getLastNode()).addChild(node);
@@ -168,6 +171,7 @@ public class NodeSelectorSlot extends AbstractLinkedProcessorSlot<Object> {
         }
 
         context.setCurNode(node);
+        // 调用下一个节点
         fireEntry(context, resourceWrapper, node, count, prioritized, args);
     }
 

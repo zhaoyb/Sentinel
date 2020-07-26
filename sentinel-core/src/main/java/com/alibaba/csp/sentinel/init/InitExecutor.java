@@ -45,14 +45,16 @@ public final class InitExecutor {
         try {
             //spi  默认配置 com.alibaba.csp.sentinel.metric.extension.MetricCallbackInit
             // 这里注意，不同的app形式，提供的实现都不一样
+            // 获取所有SPI的实现
             ServiceLoader<InitFunc> loader = ServiceLoaderUtil.getServiceLoader(InitFunc.class);
             List<OrderWrapper> initList = new ArrayList<OrderWrapper>();
+            // 迭代所有的实现
             for (InitFunc initFunc : loader) {
                 RecordLog.info("[InitExecutor] Found init func: " + initFunc.getClass().getCanonicalName());
-                //按照排序 插入到结婚initList
+                //按照排序 插入到initList
                 insertSorted(initList, initFunc);
             }
-            //以此对集合中的对象调用init方法
+            //对集合中的对象调用init方法
             for (OrderWrapper w : initList) {
                 w.func.init();
                 RecordLog.info(String.format("[InitExecutor] Executing %s with order %d",
@@ -67,6 +69,13 @@ public final class InitExecutor {
         }
     }
 
+    /**
+     *
+     * 按照 InitOrder的顺序， 插入到list
+     *
+     * @param list
+     * @param func
+     */
     private static void insertSorted(List<OrderWrapper> list, InitFunc func) {
         int order = resolveOrder(func);
         int idx = 0;

@@ -228,7 +228,7 @@ public class StatisticNode implements Node {
         if (successCount == 0) {
             return 0;
         }
-
+        // rt / count , 算出平均响应时间
         return rollingCounterInSecond.rt() * 1.0 / successCount;
     }
 

@@ -44,6 +44,7 @@ public abstract class LeapArray<T> {
     protected int sampleCount;
     protected int intervalInMs;
 
+    // 窗口容器
     protected final AtomicReferenceArray<WindowWrap<T>> array;
 
     /**
@@ -62,8 +63,11 @@ public abstract class LeapArray<T> {
         AssertUtil.isTrue(intervalInMs > 0, "total time interval of the sliding window should be positive");
         AssertUtil.isTrue(intervalInMs % sampleCount == 0, "time span needs to be evenly divided");
 
+        //是滚动窗口中每个窗口的长度，以毫秒为单位
         this.windowLengthInMs = intervalInMs / sampleCount;
+        //整个统计时长，以毫秒为单位
         this.intervalInMs = intervalInMs;
+        //整个统计时长中需要有多少个采样窗口
         this.sampleCount = sampleCount;
 
         this.array = new AtomicReferenceArray<>(sampleCount);
@@ -115,9 +119,10 @@ public abstract class LeapArray<T> {
         if (timeMillis < 0) {
             return null;
         }
-
+        // 窗口索引
         int idx = calculateTimeIdx(timeMillis);
         // Calculate current bucket start time.
+        // 当前时间窗口 对应的开始时间
         long windowStart = calculateWindowStart(timeMillis);
 
         /*
@@ -129,6 +134,7 @@ public abstract class LeapArray<T> {
          */
         while (true) {
             WindowWrap<T> old = array.get(idx);
+            // 重新创建一个新的时间窗口
             if (old == null) {
                 /*
                  *     B0       B1      B2    NULL      B4
@@ -143,14 +149,17 @@ public abstract class LeapArray<T> {
                  * succeed to update, while other threads yield its time slice.
                  */
                 WindowWrap<T> window = new WindowWrap<T>(windowLengthInMs, windowStart, newEmptyBucket(timeMillis));
+                // 放到array中去
                 if (array.compareAndSet(idx, null, window)) {
                     // Successfully updated, return the created bucket.
                     return window;
                 } else {
                     // Contention failed, the thread will yield its time slice to wait for bucket available.
+                    // 放入失败，让出CPU时间片，外面的while(true)会重试
                     Thread.yield();
                 }
             } else if (windowStart == old.windowStart()) {
+                // 直接返回当前时间窗口
                 /*
                  *     B0       B1      B2     B3      B4
                  * ||_______|_______|_______|_______|_______||___
@@ -164,6 +173,8 @@ public abstract class LeapArray<T> {
                  */
                 return old;
             } else if (windowStart > old.windowStart()) {
+                // 当前开始时间已经大于窗口时间，表示old窗口已经过期了
+
                 /*
                  *   (old)
                  *             B0       B1      B2    NULL      B4
