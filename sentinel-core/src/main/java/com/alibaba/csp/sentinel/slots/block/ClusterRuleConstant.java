@@ -16,6 +16,9 @@
 package com.alibaba.csp.sentinel.slots.block;
 
 /**
+ *
+ * 集群限流
+ *
  * @author Eric Zhao
  * @since 1.4.0
  */
@@ -24,7 +27,9 @@ public final class ClusterRuleConstant {
     public static final int FLOW_CLUSTER_STRATEGY_NORMAL = 0;
     public static final int FLOW_CLUSTER_STRATEGY_BORROW_REF = 1;
 
+    // 本地限流
     public static final int FLOW_THRESHOLD_AVG_LOCAL = 0;
+    // 全局阈值
     public static final int FLOW_THRESHOLD_GLOBAL = 1;
 
     public static final int DEFAULT_CLUSTER_SAMPLE_COUNT = 10;

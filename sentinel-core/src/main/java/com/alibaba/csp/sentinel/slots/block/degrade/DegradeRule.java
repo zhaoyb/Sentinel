@@ -67,21 +67,26 @@ public class DegradeRule extends AbstractRule {
 
     /**
      * RT threshold or exception ratio threshold count.
+     * 阈值
      */
     private double count;
 
     /**
      * Degrade recover timeout (in seconds) when degradation occurs.
+     * 降级的时间
      */
     private int timeWindow;
 
     /**
      * Degrade strategy (0: average RT, 1: exception ratio, 2: exception count).
+     *
+     * 降级策略
      */
     private int grade = RuleConstant.DEGRADE_GRADE_RT;
 
     /**
      * Minimum number of consecutive slow requests that can trigger RT circuit breaking.
+     * RT 模式下 1 秒内连续多少个请求的平均 RT 超出阈值方可触发熔断
      *
      * @since 1.7.0
      */
@@ -89,6 +94,7 @@ public class DegradeRule extends AbstractRule {
 
     /**
      * Minimum number of requests (in an active statistic time span) that can trigger circuit breaking.
+     * 异常熔断的触发最小请求数，请求数小于该值时即使异常比率超出阈值也不会熔断
      *
      * @since 1.7.0
      */
